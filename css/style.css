@@ -36,6 +36,9 @@ body {
   line-height: 1.4;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
+  /* A tela ativa ocupa o espaço que sobra e o rodapé fica sempre embaixo. */
+  display: flex;
+  flex-direction: column;
 }
 
 button { font: inherit; color: inherit; cursor: pointer; }
@@ -43,8 +46,11 @@ button:disabled { cursor: not-allowed; }
 :focus-visible { outline: 3px solid var(--amarelo-claro); outline-offset: 2px; }
 
 /* ===== Telas ===== */
-.tela { display: none; min-height: 100vh; min-height: 100dvh; padding: 24px 16px; }
-.tela.ativa { display: flex; animation: aparecer .35s ease; }
+.tela { display: none; padding: 24px 16px; }
+.tela.ativa { display: flex; flex: 1 0 auto; animation: aparecer .35s ease; }
+
+.rodape { flex: none; text-align: center; padding: 14px 16px 18px; font-size: .8rem; color: var(--texto-suave); border-top: 1px solid var(--grafite-2); }
+.rodape strong { color: var(--amarelo); font-weight: 700; }
 @keyframes aparecer { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* ===== Botões ===== */
