@@ -1,0 +1,11 @@
+{
+  "name": "sola-do-milhao",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Jogo de perguntas estilo Show do Milhão, com desafio do dia e ranking.",
+  "scripts": {
+    "config": "node ferramentas/gerar-config.js",
+    "build": "node ferramentas/gerar-config.js",
+    "validar": "node ferramentas/validar-perguntas.js"
+  }
+}

@@ -1,0 +1,10 @@
+# Chaves locais: nunca vão para o repositório
+.env
+
+# Gerado a partir do .env por ferramentas/gerar-config.js
+js/config.js
+
+# Sistema e ferramentas
+.DS_Store
+.playwright-mcp/
+node_modules/

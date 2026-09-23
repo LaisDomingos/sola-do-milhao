@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sola do Milhão</title>
+  <meta name="description" content="Sola do Milhão: jogo de perguntas e respostas no estilo Show do Milhão, com mais de 2000 perguntas.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2230%22 fill=%22%23FFD000%22/%3E%3Ctext x=%2232%22 y=%2244%22 font-size=%2234%22 font-family=%22Arial%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%230B0B0B%22%3E$%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="controles">
+    <button id="btn-som" class="btn-som" type="button" aria-label="Ligar ou desligar os efeitos sonoros" title="Efeitos sonoros">🔊</button>
+  </div>
+
+  <!-- TELA INICIAL -->
+  <section id="tela-inicio" class="tela ativa" aria-labelledby="titulo-inicio">
+    <div class="inicio-caixa">
+      <div class="logo" id="titulo-inicio">
+        <span class="logo-show">SOLA DO</span>
+        <span class="logo-milhao">MILHÃO</span>
+      </div>
+      <p class="inicio-sub">Responda 16 perguntas e ganhe <strong>R$ 1 milhão</strong>!</p>
+
+      <form id="form-inicio" class="form-inicio" autocomplete="off">
+        <label for="input-nome" class="rotulo">Qual é o seu nome?</label>
+        <input id="input-nome" type="text" maxlength="24" placeholder="Digite seu nome" required>
+        <button type="submit" class="btn btn-principal">Jogar</button>
+      </form>
+
+      <button type="button" id="btn-desafio" class="btn btn-secundario btn-festa">📅 Desafio do dia</button>
+      <button type="button" id="btn-abrir-festa" class="btn btn-secundario btn-festa">🎉 Modo festa · 2 a 6 jogadores</button>
+
+      <form id="form-festa" class="form-inicio" autocomplete="off" hidden>
+        <p class="rotulo">🎉 Quem vai jogar?</p>
+        <p class="festa-dica">Cada um joga uma pergunta por vez, no mesmo aparelho. Quem levar mais dinheiro vence!</p>
+        <div id="festa-nomes" class="festa-nomes"></div>
+        <button type="button" id="btn-add-jogador" class="btn btn-secundario">+ Adicionar jogador</button>
+        <button type="submit" class="btn btn-principal">Começar a festa</button>
+        <button type="button" id="btn-voltar-solo" class="btn-link">Voltar para o modo solo</button>
+      </form>
+
+      <p id="recorde-inicio" class="recorde" hidden></p>
+
+      <details class="regras">
+        <summary>Como jogar</summary>
+        <ul>
+          <li>São 16 perguntas: 5 valendo de R$ 1 mil a R$ 5 mil, 5 de R$ 10 mil a R$ 50 mil, 5 de R$ 100 mil a R$ 500 mil e a pergunta do <strong>milhão</strong>.</li>
+          <li><strong>Acertar</strong> leva ao próximo prêmio. <strong>Parar</strong> garante o que você já ganhou. <strong>Errar</strong> leva só a metade.</li>
+          <li><strong>Aposta final:</strong> antes de ver a pergunta do milhão, você decide se leva R$ 500 mil ou arrisca tudo. Quem arrisca não pode mais parar nem usar ajudas: errou, sai sem nada.</li>
+          <li>Ajudas: <strong>3 pulos</strong>, <strong>cartas</strong> (eliminam de 0 a 3 alternativas erradas), a <strong>IA</strong> (diz a resposta) e as <strong>placas</strong> da plateia (porcentagens de votos, mas a plateia pode errar!). Cada uma, exceto os pulos, vale uma vez.</li>
+          <li>Não tem limite de tempo: o relógio só mostra há quanto tempo você está jogando. Atalhos: teclas 1 a 4.</li>
+          <li>A dificuldade varia: pode cair uma pergunta difícil logo no começo!</li>
+          <li><strong>Desafio do dia:</strong> as mesmas 16 perguntas para todo mundo, uma tentativa por dia, com calendário, sequência de dias e ranking.</li>
+          <li><strong>Modo festa:</strong> de 2 a 6 jogadores se revezam, uma pergunta por vez, cada um com seus prêmios e ajudas. No fim, pódio para quem levou mais.</li>
+        </ul>
+      </details>
+      <p id="total-perguntas" class="total-perguntas"></p>
+    </div>
+  </section>
+
+  <!-- TELA DO JOGO -->
+  <section id="tela-jogo" class="tela" aria-label="Jogo">
+    <div class="jogo-layout">
+      <main class="jogo-principal">
+        <header class="jogo-topo">
+          <div class="jogador">
+            <span class="jogador-rotulo">Jogador</span>
+            <span id="nome-jogador" class="jogador-nome"></span>
+          </div>
+          <div class="cronometro" title="Tempo de jogo">
+            <span class="cronometro-rotulo">Tempo de jogo</span>
+            <span class="cronometro-valor"><span aria-hidden="true">⏱</span> <span id="tempo-jogo">00:00</span></span>
+          </div>
+        </header>
+
+        <div id="placar" class="placar" aria-label="Placar da festa" hidden></div>
+
+        <div class="apresentador" aria-live="polite">
+          <span class="apresentador-icone" aria-hidden="true">🎤</span>
+          <p id="fala"></p>
+        </div>
+
+        <article class="pergunta-painel">
+          <div class="pergunta-meta">
+            <span id="pergunta-num" class="pergunta-num"></span>
+          </div>
+          <h2 id="pergunta-texto" class="pergunta-texto"></h2>
+        </article>
+
+        <div id="alternativas" class="alternativas"></div>
+
+        <div class="valores" aria-label="Valores desta pergunta">
+          <div class="valor valor-errar"><span>Errar</span><strong id="v-errar"></strong></div>
+          <div class="valor valor-parar"><span>Parar</span><strong id="v-parar"></strong></div>
+          <div class="valor valor-acertar"><span>Acertar</span><strong id="v-acertar"></strong></div>
+        </div>
+
+        <div class="ajudas" aria-label="Ajudas">
+          <button type="button" class="ajuda" id="aj-pular" data-ajuda="pular">
+            <span class="ajuda-icone" aria-hidden="true">⏭️</span><span class="ajuda-nome">Pular</span><span class="ajuda-cont" id="cont-pular"></span>
+          </button>
+          <button type="button" class="ajuda" id="aj-cartas" data-ajuda="cartas">
+            <span class="ajuda-icone" aria-hidden="true">🃏</span><span class="ajuda-nome">Cartas</span>
+          </button>
+          <button type="button" class="ajuda" id="aj-ia" data-ajuda="ia">
+            <span class="ajuda-icone" aria-hidden="true">🤖</span><span class="ajuda-nome">IA</span>
+          </button>
+          <button type="button" class="ajuda" id="aj-placas" data-ajuda="placas">
+            <span class="ajuda-icone" aria-hidden="true">📊</span><span class="ajuda-nome">Placas</span>
+          </button>
+          <button type="button" class="ajuda ajuda-parar" id="btn-parar">
+            <span class="ajuda-icone" aria-hidden="true">✋</span><span class="ajuda-nome">Parar</span>
+          </button>
+        </div>
+      </main>
+
+      <aside class="escada" aria-label="Prêmios">
+        <ol id="escada"></ol>
+      </aside>
+    </div>
+  </section>
+
+  <!-- TELA FINAL -->
+  <section id="tela-fim" class="tela" aria-labelledby="fim-titulo">
+    <div class="fim-caixa">
+      <h2 id="fim-titulo" class="fim-titulo"></h2>
+      <p id="fim-msg" class="fim-msg"></p>
+      <p class="fim-rotulo">Você leva para casa</p>
+      <p id="fim-premio" class="fim-premio"></p>
+      <p id="fim-tempo" class="fim-tempo"></p>
+      <p id="fim-recorde" class="fim-recorde" hidden></p>
+      <p id="fim-ranking" class="fim-ranking" hidden></p>
+      <div class="fim-botoes">
+        <button type="button" id="btn-novamente" class="btn btn-principal">Jogar novamente</button>
+        <button type="button" id="btn-compartilhar" class="btn btn-principal" hidden>📤 Compartilhar</button>
+        <button type="button" id="btn-calendario" class="btn btn-secundario" hidden>📅 Ver calendário e ranking</button>
+        <button type="button" id="btn-inicio" class="btn btn-secundario">Trocar jogador</button>
+      </div>
+    </div>
+    <div id="confete" class="confete" aria-hidden="true"></div>
+  </section>
+
+  <!-- DESAFIO DO DIA: CALENDÁRIO E RANKING -->
+  <section id="tela-desafio" class="tela" aria-labelledby="desafio-titulo">
+    <div class="desafio-caixa">
+      <header class="desafio-topo">
+        <button type="button" id="btn-desafio-voltar" class="btn-link">← Início</button>
+        <h2 id="desafio-titulo" class="desafio-titulo">📅 Desafio do dia</h2>
+      </header>
+      <div id="desafio-stats" class="desafio-stats"></div>
+      <div class="calendario">
+        <div class="cal-nav">
+          <button type="button" id="cal-ant" class="cal-seta" aria-label="Mês anterior">‹</button>
+          <span id="cal-mes" class="cal-mes"></span>
+          <button type="button" id="cal-prox" class="cal-seta" aria-label="Próximo mês">›</button>
+        </div>
+        <div class="cal-semana" aria-hidden="true"><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span></div>
+        <div id="cal-dias" class="cal-dias"></div>
+      </div>
+      <div id="desafio-painel" class="desafio-painel" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- MODO FESTA: TROCA DE VEZ -->
+  <section id="tela-vez" class="tela" aria-labelledby="vez-nome">
+    <div class="vez-caixa">
+      <p class="vez-rotulo">📱 Passa o aparelho! Agora é a vez de</p>
+      <h2 id="vez-nome" class="vez-nome"></h2>
+      <p id="vez-info" class="vez-info"></p>
+      <button type="button" id="btn-vez" class="btn btn-principal">Bora!</button>
+      <div id="vez-placar" class="placar placar-vez" aria-label="Placar da festa"></div>
+    </div>
+  </section>
+
+  <!-- MODO FESTA: PÓDIO -->
+  <section id="tela-podio" class="tela" aria-labelledby="podio-titulo">
+    <div class="fim-caixa">
+      <p class="fim-rotulo">🎉 Fim da festa</p>
+      <h2 id="podio-titulo" class="fim-titulo"></h2>
+      <p id="podio-sub" class="fim-msg"></p>
+      <ol id="podio-lista" class="podio-lista"></ol>
+      <div class="fim-botoes">
+        <button type="button" id="btn-revanche" class="btn btn-principal">Revanche!</button>
+        <button type="button" id="btn-podio-inicio" class="btn btn-secundario">Início</button>
+      </div>
+    </div>
+    <div id="confete-podio" class="confete" aria-hidden="true"></div>
+  </section>
+
+  <!-- MODAL GENÉRICO -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <h3 id="modal-titulo" class="modal-titulo"></h3>
+      <div id="modal-corpo" class="modal-corpo"></div>
+      <div id="modal-botoes" class="modal-botoes"></div>
+    </div>
+  </div>
+
+  <!-- Bancos de perguntas -->
+  <script src="perguntas/historia.js"></script>
+  <script src="perguntas/geografia.js"></script>
+  <script src="perguntas/ciencias.js"></script>
+  <script src="perguntas/matematica.js"></script>
+  <script src="perguntas/portugues.js"></script>
+  <script src="perguntas/artes.js"></script>
+  <script src="perguntas/esportes.js"></script>
+  <script src="perguntas/entretenimento.js"></script>
+  <script src="perguntas/cultura-brasileira.js"></script>
+  <script src="perguntas/mitologia.js"></script>
+  <script src="perguntas/tecnologia.js"></script>
+  <script src="perguntas/curiosidades.js"></script>
+  <script src="perguntas/dificeis-humanas.js"></script>
+  <script src="perguntas/dificeis-exatas.js"></script>
+  <script src="perguntas/dificeis-cultura.js"></script>
+
+  <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ajudas.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/desafio.js"></script>
+  <script src="js/jogo.js"></script>
+</body>
+</html>
