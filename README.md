@@ -1,6 +1,6 @@
 # 🟡 Sola do Milhão
 
-Jogo de perguntas e respostas inspirado no Show do Milhão, em amarelo e preto. São mais de 2.400 perguntas de conhecimentos gerais em quatro níveis de dificuldade, as ajudas clássicas, aposta final, modo festa e desafio do dia com ranking online.
+Jogo de perguntas e respostas inspirado no Show do Milhão, em amarelo e preto. São mais de 4.000 perguntas de conhecimentos gerais em quatro níveis de dificuldade, as ajudas clássicas, aposta final, modo festa e desafio do dia com ranking online.
 
 Feito em HTML, CSS e JavaScript puro, sem framework e sem etapa de build obrigatória.
 
